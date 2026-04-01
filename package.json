@@ -1,0 +1,112 @@
+{
+  "name": "vailcast-player",
+  "version": "1.1.0",
+  "description": "Secure canvas-based video player with teleporting watermarks",
+  "type": "module",
+  "license": "MIT",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./dist/vailcast.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
+    },
+    "./angular": {
+      "types": "./dist/angular.d.ts",
+      "import": "./dist/angular.js",
+      "require": "./dist/angular.cjs"
+    },
+    "./styles.css": "./dist/vailcast.css"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "video-player",
+    "hls",
+    "canvas",
+    "watermark",
+    "react",
+    "angular"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Omar0Gamal/vailcast-player.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Omar0Gamal/vailcast-player/issues"
+  },
+  "homepage": "https://github.com/Omar0Gamal/vailcast-player#readme",
+  "scripts": {
+    "build": "npm run build:ts && npm run build:css",
+    "build:ts": "tsup",
+    "build:css": "node scripts/copy-css.mjs",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "prepublishOnly": "npm run validate"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "@angular/core": ">=14",
+    "@angular/common": ">=14"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "@angular/core": {
+      "optional": true
+    },
+    "@angular/common": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "hls.js": "^1.6.15"
+  },
+  "devDependencies": {
+    "@angular/common": "^19.0.0",
+    "@angular/core": "^19.0.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/parser": "^8.21.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.4.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "rxjs": "^7.8.1",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.2",
+    "vitest": "^2.1.8",
+    "zone.js": "~0.15.0"
+  }
+}

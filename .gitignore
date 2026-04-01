@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+.vscode/
+.DS_Store
+*.log
+
+examples/nextjs-app/node_modules/
+examples/nextjs-app/.next/
