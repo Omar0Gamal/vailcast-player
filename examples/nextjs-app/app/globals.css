@@ -1,0 +1,25 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: linear-gradient(180deg, #0b1220, #10192a);
+  color: #f6f8ff;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.player-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid #2a3550;
+  border-radius: 12px;
+  overflow: hidden;
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vailcast Player - Vanilla Example</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #10131a;
+        color: #f5f7ff;
+      }
+
+      .layout {
+        max-width: 960px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+
+      #player {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #2a3448;
+      }
+
+      button {
+        margin-top: 16px;
+        padding: 10px 16px;
+        border: 0;
+        border-radius: 8px;
+        background: #3a74ff;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="layout">
+      <h1>Vailcast Player (Vanilla HTML)</h1>
+      <div id="player"></div>
+      <button id="play-btn">Play</button>
+    </main>
+
+    <script type="module">
+      import { VailcastPlayer } from '../../dist/index.mjs';
+
+      const host = document.getElementById('player');
+      const playButton = document.getElementById('play-btn');
+
+      const player = new VailcastPlayer(host, {
+        manifestUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+        userID: 'vanilla-dev',
+        watermark: {
+          enabled: true,
+          jumpIntervalMs: 3000,
+        },
+      });
+
+      playButton.addEventListener('click', () => {
+        void player.play();
+      });
+    </script>
+  </body>
+</html>

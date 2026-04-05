@@ -1,0 +1,21 @@
+{
+  "name": "vailcast-player-nextjs-example",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vailcast-player": "file:../.."
+  },
+  "devDependencies": {
+    "typescript": "^6.0.2",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3"
+  }
+}
