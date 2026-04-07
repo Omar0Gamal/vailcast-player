@@ -1,0 +1,52 @@
+name: Feature request
+description: Propose an enhancement for vailcast-player
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing an idea. Please describe the use case and expected outcome.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem are you trying to solve?
+      placeholder: As a developer, I need...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe your ideal API or behavior.
+      placeholder: Add an option called...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workarounds or alternative designs?
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Core player
+        - React adapter
+        - Angular adapter
+        - Tooling/CI
+        - Documentation
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: This proposal is scoped to a concrete use case.
+          required: true
