@@ -1,6 +1,6 @@
 {
   "name": "vailcast-player",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Secure canvas-based video player with teleporting watermarks",
   "type": "module",
   "license": "MIT",
