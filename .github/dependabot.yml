@@ -8,8 +8,6 @@ updates:
       time: "08:00"
       timezone: Africa/Cairo
     open-pull-requests-limit: 10
-    labels:
-      - dependencies
     commit-message:
       prefix: chore
       include: scope
@@ -33,8 +31,6 @@ updates:
       time: "08:15"
       timezone: Africa/Cairo
     open-pull-requests-limit: 5
-    labels:
-      - dependencies
     commit-message:
       prefix: chore
       include: scope
@@ -47,8 +43,6 @@ updates:
       time: "08:30"
       timezone: Africa/Cairo
     open-pull-requests-limit: 5
-    labels:
-      - dependencies
     commit-message:
       prefix: chore
       include: scope
