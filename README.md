@@ -86,6 +86,17 @@ npm run validate
 npm run build
 ```
 
+## First npm release
+
+1. Ensure GitHub Actions secret NPM_TOKEN is set for the repository.
+2. Run the release preflight locally:
+   - npm run release:check
+3. Create and push the first stable tag:
+   - git tag -a v1.0.0 -m "release: v1.0.0"
+   - git push origin v1.0.0
+
+Pushing a v* tag triggers the publish workflow in GitHub Actions.
+
 ## Local Examples
 
 - Vanilla HTML: `examples/vanilla-html/index.html`
