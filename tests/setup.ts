@@ -2,13 +2,33 @@ import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 
 vi.mock('hls.js', () => {
   class MockHls {
+    public static Events = {
+      MANIFEST_PARSED: 'manifestParsed',
+      LEVEL_LOADED: 'levelLoaded',
+      LEVEL_SWITCHED: 'levelSwitched',
+      LEVELS_UPDATED: 'levelsUpdated',
+    } as const;
+
     public static isSupported(): boolean {
       return true;
     }
 
+    public levels: Array<{
+      width?: number;
+      height?: number;
+      bitrate?: number;
+    }> = [];
+
+    public currentLevel = -1;
+    public nextLevel = -1;
+    public loadLevel = -1;
+    public nextLoadLevel = -1;
+
     public loadSource = vi.fn();
     public attachMedia = vi.fn();
     public destroy = vi.fn();
+    public on = vi.fn();
+    public off = vi.fn();
   }
 
   return {
