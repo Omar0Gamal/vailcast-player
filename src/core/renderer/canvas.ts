@@ -11,6 +11,7 @@ export class CanvasRenderer {
   private ctx: CanvasRenderingContext2D | null;
   private rafId = 0;
   private running = false;
+  private drawVideoFrame = true;
 
   constructor(
     private readonly video: HTMLVideoElement,
@@ -40,6 +41,10 @@ export class CanvasRenderer {
     this.ctx = null;
   }
 
+  public setDrawVideoFrame(enabled: boolean): void {
+    this.drawVideoFrame = enabled;
+  }
+
   private render = (timestamp: number): void => {
     if (!this.running || !this.ctx) {
       return;
@@ -48,7 +53,7 @@ export class CanvasRenderer {
     this.syncCanvasSize();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if (this.video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+    if (this.drawVideoFrame && this.video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
       this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
     }
 

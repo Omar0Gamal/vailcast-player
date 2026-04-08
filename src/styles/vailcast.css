@@ -3,18 +3,382 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #000;
+  background: #050507;
+  isolation: isolate;
 }
 
 .vailcast-player-video,
 .vailcast-player-canvas {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
+  object-fit: contain;
 }
 
 .vailcast-player-video {
+  z-index: 1;
+  background: #050507;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.vailcast-player-canvas {
+  z-index: 2;
+  pointer-events: none;
+}
+
+.vailcast-player--ui-cinema .vailcast-player-video {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.vailcast-cinema-ui {
+  --vailcast-input-accent: oklch(0.64 0.26 27);
+  --vailcast-input-track: oklch(0.68 0.01 260 / 0.5);
+  --vailcast-input-focus: oklch(0.72 0.2 35 / 0.85);
+  --vailcast-input-selected: oklch(0.64 0.26 27 / 0.92);
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+  opacity: 0;
+  color: oklch(0.96 0.01 260);
+  font-family: 'Avenir Next', 'Montserrat', 'Segoe UI', sans-serif;
+  transition: opacity 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.vailcast-cinema-ui--active {
+  opacity: 1;
+}
+
+.vailcast-cinema-ui__panel {
+  width: 100%;
+  padding: 16px clamp(14px, 2.2vw, 26px) 20px;
+  pointer-events: auto;
+  background:
+    linear-gradient(to top, oklch(0.08 0.01 265 / 0.96) 0%, oklch(0.08 0.01 265 / 0.58) 48%, oklch(0.08 0.01 265 / 0) 100%);
+}
+
+.vailcast-cinema-ui__timeline-shell {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.vailcast-cinema-ui__timeline-track {
+  position: relative;
+  height: 18px;
+}
+
+.vailcast-cinema-ui__timeline-buffered,
+.vailcast-cinema-ui__timeline-played {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+
+.vailcast-cinema-ui__timeline-buffered {
+  background: var(--vailcast-input-track);
+}
+
+.vailcast-cinema-ui__timeline-played {
+  background: var(--vailcast-input-accent);
+}
+
+.vailcast-cinema-ui__timeline-input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  background: transparent;
+  appearance: none;
+}
+
+.vailcast-cinema-ui__timeline-input::-webkit-slider-runnable-track {
+  height: 18px;
+  background: transparent;
+}
+
+.vailcast-cinema-ui__timeline-input::-moz-range-track {
+  height: 18px;
+  background: transparent;
+}
+
+.vailcast-cinema-ui__timeline-input:focus-visible {
+  outline: 2px solid var(--vailcast-input-focus);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+.vailcast-cinema-ui__timeline-input::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--vailcast-input-accent);
+  appearance: none;
+  box-shadow: 0 0 0 2px oklch(0.18 0.02 260 / 0.95);
+}
+
+.vailcast-cinema-ui__timeline-input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--vailcast-input-accent);
+  box-shadow: 0 0 0 2px oklch(0.18 0.02 260 / 0.95);
+}
+
+.vailcast-cinema-ui__preview {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  transform: translateX(0);
+  border-radius: 10px;
+  border: 1px solid oklch(0.51 0.02 260 / 0.56);
+  background: oklch(0.16 0.01 260 / 0.94);
+  box-shadow: 0 16px 38px oklch(0.03 0.01 260 / 0.52);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.vailcast-cinema-ui__preview-image {
+  width: 176px;
+  height: 99px;
+  background-color: oklch(0.18 0.01 260);
+  background-repeat: no-repeat;
+}
+
+.vailcast-cinema-ui__preview-image--empty {
+  background-image: linear-gradient(130deg, oklch(0.25 0.03 260), oklch(0.35 0.04 20));
+}
+
+.vailcast-cinema-ui__preview-time {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.vailcast-cinema-ui__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vailcast-cinema-ui__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1px solid oklch(0.58 0.02 260 / 0.55);
+  border-radius: 999px;
+  background: oklch(0.2 0.01 260 / 0.86);
+  color: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition:
+    background 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.vailcast-cinema-ui__button:hover {
+  background: oklch(0.3 0.02 260 / 0.9);
+  border-color: oklch(0.72 0.02 260 / 0.65);
+  box-shadow: 0 8px 20px oklch(0.03 0.01 260 / 0.35);
+}
+
+.vailcast-cinema-ui__button:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.vailcast-cinema-ui__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vailcast-cinema-ui__button:focus-visible {
+  outline: 2px solid var(--vailcast-input-focus);
+  outline-offset: 2px;
+}
+
+.vailcast-cinema-ui__button--icon-only {
+  width: 44px;
+  padding: 0;
+}
+
+.vailcast-cinema-ui__button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.vailcast-cinema-ui__button-icon svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.vailcast-cinema-ui__button-value {
+  min-width: 32px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.vailcast-cinema-ui__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
+}
+
+.vailcast-cinema-ui__time {
+  min-width: 120px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vailcast-cinema-ui__volume {
+  width: 112px;
+  height: 38px;
+  accent-color: var(--vailcast-input-accent);
+}
+
+.vailcast-cinema-ui__spacer {
+  flex: 1;
+}
+
+.vailcast-cinema-ui__dial {
+  position: relative;
+}
+
+.vailcast-cinema-ui__menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid oklch(0.46 0.02 260 / 0.5);
+  background: oklch(0.14 0.01 260 / 0.94);
+  box-shadow: 0 14px 36px oklch(0.03 0.01 260 / 0.5);
+}
+
+.vailcast-cinema-ui__menu[hidden] {
   display: none;
+}
+
+.vailcast-cinema-ui__menu-item {
+  border: 0;
+  border-radius: 8px;
+  text-align: left;
+  min-height: 40px;
+  padding: 8px 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.vailcast-cinema-ui__menu-item:hover {
+  background: oklch(0.27 0.02 260 / 0.78);
+}
+
+.vailcast-cinema-ui__menu-item:focus-visible {
+  outline: 2px solid var(--vailcast-input-focus);
+  outline-offset: 2px;
+}
+
+.vailcast-cinema-ui__menu-item:active {
+  transform: translateY(1px);
+}
+
+.vailcast-cinema-ui__menu-item.is-selected {
+  background: var(--vailcast-input-selected);
+  color: oklch(0.97 0 0);
+}
+
+@media (max-width: 760px) {
+  .vailcast-cinema-ui__panel {
+    padding: 12px 12px 14px;
+  }
+
+  .vailcast-cinema-ui__row {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .vailcast-cinema-ui__time {
+    min-width: 0;
+    font-size: 13px;
+  }
+
+  .vailcast-cinema-ui__volume {
+    width: 84px;
+    height: 44px;
+  }
+
+  .vailcast-cinema-ui__button {
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+
+  .vailcast-cinema-ui__button--icon-only {
+    width: 44px;
+  }
+
+  .vailcast-cinema-ui__menu-item {
+    min-height: 44px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 540px) {
+  .vailcast-cinema-ui__volume {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vailcast-player-video,
+  .vailcast-cinema-ui,
+  .vailcast-cinema-ui__button,
+  .vailcast-cinema-ui__menu-item {
+    transition: none !important;
+  }
 }

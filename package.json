@@ -71,10 +71,10 @@
     "release:tag": "node -e \"const p=require('./package.json'); console.log('v'+p.version)\""
   },
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18",
+    "@angular/common": ">=14",
     "@angular/core": ">=14",
-    "@angular/common": ">=14"
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -91,6 +91,8 @@
     }
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-solid-svg-icons": "^7.2.0",
     "hls.js": "^1.6.15"
   },
   "devDependencies": {
