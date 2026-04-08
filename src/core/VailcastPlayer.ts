@@ -256,7 +256,7 @@ function resolveOptions(options: VailcastOptions, context: ResolveContext): Reso
     hlsConfig: options.hlsConfig ?? {},
     watermark: {
       enabled: watermark.enabled ?? DEFAULT_WATERMARK.enabled,
-      text: watermark.text ?? `ID: ${userID}`,
+      text: watermark.text ?? userID,
       jumpIntervalMs: watermark.jumpIntervalMs ?? DEFAULT_WATERMARK.jumpIntervalMs,
       font: watermark.font ?? DEFAULT_WATERMARK.font,
       color: watermark.color ?? DEFAULT_WATERMARK.color,

@@ -108,7 +108,7 @@ export class HlsManager {
         width: level.width ?? 0,
         height: level.height ?? 0,
         bitrate: level.bitrate ?? 0,
-        label: formatQualityLabel(level.height ?? 0, level.bitrate ?? 0),
+        label: formatQualityLabel(level.height ?? 0),
       }))
       .sort((a, b) => {
         if (a.height !== b.height) {
@@ -213,11 +213,10 @@ export class HlsManager {
   }
 }
 
-function formatQualityLabel(height: number, bitrate: number): string {
+function formatQualityLabel(height: number): string {
   if (height <= 0) {
     return 'Unknown';
   }
 
-  const kbps = bitrate > 0 ? Math.round(bitrate / 1000) : null;
-  return kbps ? `${height}p (${kbps} kbps)` : `${height}p`;
+  return `${height}p`;
 }

@@ -4,12 +4,12 @@ import { VailcastReactPlayer } from 'vailcast-player/react';
 import type { VailcastOptions } from 'vailcast-player';
 
 const config: VailcastOptions = {
-  manifestUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+  manifestUrl: '/test/output_assets/index.m3u8',
   userID: 'nextjs-dev',
   ui: {
     mode: 'cinema',
     speedOptions: [0.5, 0.75, 1, 1.25, 1.5, 2],
-    previewVttUrl: '/previews/demo-thumbnails.vtt',
+    previewVttUrl: '/test/output_assets/previews.vtt',
     inputTheme: {
       accentColor: 'oklch(0.68 0.22 28)',
       focusColor: 'oklch(0.84 0.14 74)',

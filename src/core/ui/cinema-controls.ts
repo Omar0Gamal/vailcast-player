@@ -12,6 +12,7 @@ import {
 import type { HlsManager } from '../hls-manager';
 import type { ResolvedPlayerUiConfig } from '../types';
 import {
+  buildPreviewVttUrlCandidates,
   findTimelinePreviewCue,
   loadTimelinePreviewTrack,
   type TimelinePreviewTrack,
@@ -81,6 +82,8 @@ export class CinemaControls {
   private previewTrack: TimelinePreviewTrack | null = null;
   private previewVttUrl: string | null = null;
   private previewLoadController: AbortController | null = null;
+  private readonly previewImageBounds = new Map<string, { width: number; height: number }>();
+  private readonly previewImageBoundsRequests = new Map<string, Promise<void>>();
 
   constructor(
     private readonly container: HTMLElement,
@@ -498,6 +501,8 @@ export class CinemaControls {
       this.previewImage.classList.add('vailcast-cinema-ui__preview-image--empty');
       this.previewImage.style.width = '';
       this.previewImage.style.height = '';
+      this.previewImage.style.backgroundPosition = '';
+      this.previewImage.style.backgroundSize = '';
     } else {
       this.previewImage.classList.remove('vailcast-cinema-ui__preview-image--empty');
       this.previewImage.style.backgroundImage = `url("${cue.imageUrl}")`;
@@ -508,13 +513,16 @@ export class CinemaControls {
         this.previewImage.style.width = '';
         this.previewImage.style.height = '';
       } else {
-        const scale = cue.sprite.width > MAX_PREVIEW_WIDTH ? MAX_PREVIEW_WIDTH / cue.sprite.width : 1;
+        const spriteSheetBounds = this.getSpriteSheetBounds(cue.imageUrl);
+        const scale = spriteSheetBounds ? (cue.sprite.width > MAX_PREVIEW_WIDTH ? MAX_PREVIEW_WIDTH / cue.sprite.width : 1) : 1;
         const previewWidth = Math.round(cue.sprite.width * scale);
         const previewHeight = Math.round(cue.sprite.height * scale);
 
         this.previewImage.style.width = `${previewWidth}px`;
         this.previewImage.style.height = `${previewHeight}px`;
-        this.previewImage.style.backgroundSize = `${Math.round(100 * scale)}% auto`;
+        this.previewImage.style.backgroundSize = spriteSheetBounds
+          ? `${Math.round(spriteSheetBounds.width * scale)}px ${Math.round(spriteSheetBounds.height * scale)}px`
+          : 'auto';
         this.previewImage.style.backgroundPosition = `${-Math.round(cue.sprite.x * scale)}px ${-Math.round(
           cue.sprite.y * scale,
         )}px`;
@@ -523,6 +531,60 @@ export class CinemaControls {
 
     const previewWidth = this.previewBubble.offsetWidth || DEFAULT_PREVIEW_WIDTH;
     this.previewBubble.style.left = `${resolvePreviewLeft(ratio, rect.width, previewWidth)}px`;
+  }
+
+  private getSpriteSheetBounds(imageUrl: string): { width: number; height: number } | null {
+    const cachedBounds = this.previewImageBounds.get(imageUrl);
+    if (cachedBounds) {
+      return cachedBounds;
+    }
+
+    void this.ensurePreviewImageBounds(imageUrl);
+    return null;
+  }
+
+  private preloadPreviewImages(track: TimelinePreviewTrack): void {
+    const imageUrls = new Set(track.cues.map((cue) => cue.imageUrl));
+    imageUrls.forEach((imageUrl) => {
+      void this.ensurePreviewImageBounds(imageUrl);
+    });
+  }
+
+  private ensurePreviewImageBounds(imageUrl: string): Promise<void> {
+    if (this.previewImageBounds.has(imageUrl)) {
+      return Promise.resolve();
+    }
+
+    const existingRequest = this.previewImageBoundsRequests.get(imageUrl);
+    if (existingRequest) {
+      return existingRequest;
+    }
+
+    const request = new Promise<void>((resolve) => {
+      const image = new Image();
+
+      image.onload = () => {
+        if (image.naturalWidth > 0 && image.naturalHeight > 0) {
+          this.previewImageBounds.set(imageUrl, {
+            width: image.naturalWidth,
+            height: image.naturalHeight,
+          });
+        }
+
+        this.previewImageBoundsRequests.delete(imageUrl);
+        resolve();
+      };
+
+      image.onerror = () => {
+        this.previewImageBoundsRequests.delete(imageUrl);
+        resolve();
+      };
+
+      image.src = imageUrl;
+    });
+
+    this.previewImageBoundsRequests.set(imageUrl, request);
+    return request;
   }
 
   private hidePreview(): void {
@@ -797,6 +859,8 @@ export class CinemaControls {
     this.previewLoadController?.abort();
     this.previewLoadController = null;
     this.previewTrack = null;
+    this.previewImageBounds.clear();
+    this.previewImageBoundsRequests.clear();
 
     if (!vttUrl) {
       return;
@@ -805,12 +869,20 @@ export class CinemaControls {
     const requestController = new AbortController();
     this.previewLoadController = requestController;
 
-    const track = await loadTimelinePreviewTrack(vttUrl, requestController.signal);
-    if (this.previewLoadController !== requestController) {
-      return;
-    }
+    const candidateVttUrls = buildPreviewVttUrlCandidates(vttUrl);
 
-    this.previewTrack = track;
+    for (const candidateVttUrl of candidateVttUrls) {
+      const track = await loadTimelinePreviewTrack(candidateVttUrl, requestController.signal);
+      if (this.previewLoadController !== requestController) {
+        return;
+      }
+
+      if (track) {
+        this.previewTrack = track;
+        this.preloadPreviewImages(track);
+        return;
+      }
+    }
   }
 
   private async toggleFullscreen(): Promise<void> {

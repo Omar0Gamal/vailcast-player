@@ -17,6 +17,8 @@ export interface TimelinePreviewTrack {
   cues: TimelinePreviewCue[];
 }
 
+const FALLBACK_PREVIEW_VTT_FILES = ['previews.vtt', 'preview.vtt', 'index.vtt'] as const;
+
 export async function loadTimelinePreviewTrack(
   vttUrl: string,
   signal?: AbortSignal,
@@ -36,6 +38,49 @@ export async function loadTimelinePreviewTrack(
     return parseTimelinePreviewTrack(vttText, vttUrl);
   } catch {
     return null;
+  }
+}
+
+export function buildPreviewVttUrlCandidates(vttUrl: string): string[] {
+  const normalizedUrl = vttUrl.trim();
+  if (normalizedUrl.length === 0) {
+    return [];
+  }
+
+  try {
+    const parsedUrl = new URL(normalizedUrl, resolvePreviewBaseUrl());
+    const pathname = parsedUrl.pathname;
+    const lastSlashIndex = pathname.lastIndexOf('/');
+    const directory = lastSlashIndex >= 0 ? pathname.slice(0, lastSlashIndex + 1) : '/';
+    const fileName = pathname.slice(lastSlashIndex + 1);
+
+    const seen = new Set<string>();
+    const candidates: string[] = [];
+
+    const pushCandidate = (nextPathname: string): void => {
+      parsedUrl.pathname = nextPathname;
+      const candidate = parsedUrl.toString();
+      if (seen.has(candidate)) {
+        return;
+      }
+
+      seen.add(candidate);
+      candidates.push(candidate);
+    };
+
+    pushCandidate(pathname);
+
+    FALLBACK_PREVIEW_VTT_FILES.forEach((fallbackFileName) => {
+      if (fallbackFileName.toLowerCase() === fileName.toLowerCase()) {
+        return;
+      }
+
+      pushCandidate(`${directory}${fallbackFileName}`);
+    });
+
+    return candidates;
+  } catch {
+    return [normalizedUrl];
   }
 }
 
@@ -102,13 +147,29 @@ export function findTimelinePreviewCue(
     return null;
   }
 
+  let previousCue: TimelinePreviewCue | null = null;
+
   for (const cue of track.cues) {
     if (time >= cue.startTime && time <= cue.endTime) {
       return cue;
     }
+
+    if (time < cue.startTime) {
+      return previousCue ?? cue;
+    }
+
+    previousCue = cue;
   }
 
-  return null;
+  return previousCue;
+}
+
+function resolvePreviewBaseUrl(): string {
+  if (typeof window !== 'undefined' && typeof window.location?.href === 'string') {
+    return window.location.href;
+  }
+
+  return 'http://localhost/';
 }
 
 function parseTimingLine(line: string): { startTime: number; endTime: number } | null {
@@ -186,20 +247,31 @@ function resolveAssetUrl(assetUrl: string, sourceUrl: string): string | null {
 }
 
 function parseSprite(fragment: string | null): TimelinePreviewSprite | null {
-  if (!fragment || !fragment.startsWith('xywh=')) {
+  if (!fragment) {
     return null;
   }
 
-  const [xRaw, yRaw, widthRaw, heightRaw] = fragment
-    .slice('xywh='.length)
-    .split(',')
-    .map((part) => Number(part.trim()));
+  const normalizedFragment = decodeFragment(fragment.trim());
+  const match = normalizedFragment.match(
+    /(?:^|&)xywh=(?:pixel:)?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i,
+  );
+
+  if (!match) {
+    return null;
+  }
+
+  const xRaw = Number(match[1]);
+  const yRaw = Number(match[2]);
+  const widthRaw = Number(match[3]);
+  const heightRaw = Number(match[4]);
 
   if (
     !Number.isFinite(xRaw) ||
     !Number.isFinite(yRaw) ||
     !Number.isFinite(widthRaw) ||
-    !Number.isFinite(heightRaw)
+    !Number.isFinite(heightRaw) ||
+    widthRaw <= 0 ||
+    heightRaw <= 0
   ) {
     return null;
   }
@@ -210,4 +282,12 @@ function parseSprite(fragment: string | null): TimelinePreviewSprite | null {
     width: widthRaw,
     height: heightRaw,
   };
+}
+
+function decodeFragment(fragment: string): string {
+  try {
+    return decodeURIComponent(fragment);
+  } catch {
+    return fragment;
+  }
 }
