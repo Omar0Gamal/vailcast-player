@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-label="Preview 00:45">
+  <defs>
+    <linearGradient id="g5" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f2533" />
+      <stop offset="100%" stop-color="#482646" />
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#g5)" />
+  <text x="18" y="36" fill="#f7f7f7" font-family="Avenir Next, Segoe UI, sans-serif" font-size="18" font-weight="600">Preview</text>
+  <text x="18" y="86" fill="#ffffff" font-family="Avenir Next, Segoe UI, sans-serif" font-size="42" font-weight="700">00:45</text>
+</svg>

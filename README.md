@@ -5,6 +5,7 @@ A canvas-based HLS video player with moving watermark overlays, plus optional Re
 ## Features
 
 - Framework-agnostic core engine
+- UI modes: headless or Cinema-style custom controls
 - React adapter via `vailcast-player/react`
 - Angular adapter via `vailcast-player/angular`
 - Strict TypeScript declarations for all public APIs
@@ -31,6 +32,11 @@ if (!host) {
 const player = new VailcastPlayer(host, {
   manifestUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
   userID: 'viewer-123',
+  ui: {
+    mode: 'cinema',
+    speedOptions: [0.5, 0.75, 1, 1.25, 1.5, 2],
+    previewVttUrl: 'https://cdn.example.com/thumbs/preview.vtt',
+  },
   watermark: {
     enabled: true,
     jumpIntervalMs: 3000,
@@ -56,6 +62,48 @@ export function PlayerView() {
   return <VailcastReactPlayer config={config} />;
 }
 ```
+
+## UI Modes
+
+`VailcastOptions.ui` accepts:
+
+```ts
+{
+  mode?: 'headless' | 'cinema';
+  controls?: boolean;
+  speedOptions?: number[];
+  previewVttUrl?: string;
+  attemptPreviewVtt?: boolean;
+  inputTheme?: {
+    accentColor?: string;
+    trackColor?: string;
+    focusColor?: string;
+    selectedColor?: string;
+  };
+}
+```
+
+- `headless` (default): hides the native `<video>` element and renders frames on canvas.
+- `cinema`: enables a clean custom control bar with speed + resolution dials and timeline preview support.
+- `controls`: optional override for Cinema controls behavior (defaults to `true` in `cinema` mode).
+- `speedOptions`: playback rates shown in the speed dial (defaults to `[0.75, 1, 1.25, 1.5, 2]`).
+- `previewVttUrl`: thumbnail VTT URL for timeline preview hover cards.
+- `attemptPreviewVtt`: when `true`, tries to infer a VTT URL from the manifest (defaults to `true` in `cinema` mode).
+- `inputTheme`: customize the Cinema control input colors (accent, focus, track, selected menu state).
+
+## Security
+
+`userID` is immutable by default after player initialization.
+
+```ts
+{
+  security?: {
+    lockUserID?: boolean; // default true
+  };
+}
+```
+
+When `lockUserID` is enabled, calling `updateOptions` with a different `userID` throws an error.
 
 ## Usage (Angular)
 

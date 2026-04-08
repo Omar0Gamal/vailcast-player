@@ -25,43 +25,43 @@
         overflow: hidden;
         border: 1px solid #2a3448;
       }
-
-      button {
-        margin-top: 16px;
-        padding: 10px 16px;
-        border: 0;
-        border-radius: 8px;
-        background: #3a74ff;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-      }
     </style>
   </head>
   <body>
     <main class="layout">
       <h1>Vailcast Player (Vanilla HTML)</h1>
       <div id="player"></div>
-      <button id="play-btn">Play</button>
     </main>
 
     <script type="module">
       import { VailcastPlayer } from '../../dist/index.mjs';
 
       const host = document.getElementById('player');
-      const playButton = document.getElementById('play-btn');
 
-      const player = new VailcastPlayer(host, {
+      new VailcastPlayer(host, {
         manifestUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
         userID: 'vanilla-dev',
+        ui: {
+          mode: 'cinema',
+          inputTheme: {
+            accentColor: 'oklch(0.7 0.2 26)',
+            focusColor: 'oklch(0.84 0.14 74)',
+            trackColor: 'oklch(0.72 0.04 265 / 0.45)',
+            selectedColor: 'oklch(0.7 0.2 26 / 0.92)',
+          },
+        },
+        security: {
+          lockUserID: true,
+        },
+        hlsConfig: {
+          xhrSetup(xhr) {
+            xhr.withCredentials = false;
+          },
+        },
         watermark: {
           enabled: true,
           jumpIntervalMs: 3000,
         },
-      });
-
-      playButton.addEventListener('click', () => {
-        void player.play();
       });
     </script>
   </body>
